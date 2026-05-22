@@ -1225,18 +1225,16 @@ Rules: Be concise, warm, and professional. Keep replies under 80 words. Always e
     const el = document.getElementById('rh-typing');
     if (el) el.remove();
   }
-
-  async function sendMsg(text) {
+async function sendMsg(text) {
     if (!text.trim() || loading) return;
     loading = true;
     sendB.disabled = true;
 
     addUser(text);
 
-    // Add to history
     history.push({
       role: 'user',
-      parts: [{ text: SYSTEM_CONTEXT + '\n\nUser: ' + text }]
+      parts: [{ text: text }]
     });
 
     showTyping();
@@ -1244,13 +1242,23 @@ Rules: Be concise, warm, and professional. Keep replies under 80 words. Always e
     try {
       const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY;
 
+      const fullContents = [
+        { role: 'user', parts: [{ text: SYSTEM_CONTEXT }] },
+        { role: 'model', parts: [{ text: 'Understood. I will help visitors of Robin Hossain portfolio.' }] },
+        ...history
+      ];
+
       const body = {
-        contents: history,
+        contents: fullContents,
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 300
         }
       };
+
+
+
+  
 
       const res = await fetch(url, {
         method: 'POST',
