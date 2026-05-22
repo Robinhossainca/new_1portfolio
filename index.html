@@ -1063,6 +1063,7 @@ function sendEmail(){
   padding: 10px 14px; font-size: 13.5px;
   line-height: 1.6; color: #1a1a1a;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  white-space: pre-wrap;
 }
 .rh-user-msg {
   align-self: flex-end; max-width: 85%;
@@ -1070,7 +1071,7 @@ function sendEmail(){
   color: #f5f3ef; border-radius: 14px 14px 4px 14px;
   padding: 10px 14px; font-size: 13.5px; line-height: 1.6;
 }
-.rh-qr-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-self: flex-start; }
+.rh-qr-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; align-self: flex-start; }
 .rh-qr {
   background: #fff; border: 1.5px solid #c9a84c;
   color: #1a2a1a; font-size: 12px; padding: 5px 12px;
@@ -1082,6 +1083,7 @@ function sendEmail(){
   background: #fff; border: 1px solid #e8e4dc;
   border-radius: 14px 14px 14px 4px;
   padding: 12px 16px; display: flex; gap: 5px; align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 .rh-typing span {
   width: 7px; height: 7px; background: #aaa;
@@ -1109,9 +1111,10 @@ function sendEmail(){
   background: linear-gradient(135deg, #1a2a1a, #2d4a2d);
   border: none; color: #c9a84c; font-size: 16px; cursor: pointer; flex-shrink: 0;
 }
+#rh-send:disabled { opacity: 0.5; cursor: not-allowed; }
 @media(max-width:420px){
   #rh-chat-window { width: calc(100vw - 24px); right: 12px; }
-  #rh-chat-toggle { right: 12px; bottom: 16px; }
+  #rh-chat-toggle { right: 12px; bottom: 16px; font-size: 12px; padding: 0 14px; }
 }
 </style>
 
@@ -1141,37 +1144,40 @@ function sendEmail(){
   // ✅ এখানে আপনার Gemini API Key বসান
   const API_KEY = 'AIzaSyBiEaDBMH6KUUtvF7-APc5_dVKBobXDiMQ';
 
-  const SYSTEM = `You are a helpful assistant for Robin Hossain's professional portfolio website.
+  const SYSTEM_CONTEXT = `You are a helpful assistant for Robin Hossain's professional portfolio website.
 Robin is a Professional Accountant and Audit & Finance Consultant based in Bangladesh.
-Services: Audit & assurance, financial reporting, tax advisory, bookkeeping, business consulting.
-Email: hossainrobin.ca@gmail.com
-WhatsApp: +880 140-057-5079
-LinkedIn: linkedin.com/in/robinhossain37189
-Be concise, warm, and professional. Always encourage visitors to contact Robin directly.
-Answer in the same language the user writes in (Bengali or English).`;
+His services include: Audit & assurance, financial reporting, tax advisory, bookkeeping, business consulting.
+Contact: Email: hossainrobin.ca@gmail.com | WhatsApp: +880 140-057-5079 | LinkedIn: linkedin.com/in/robinhossain37189
+Rules: Be concise, warm, and professional. Keep replies under 80 words. Always encourage visitors to contact Robin. Answer in the same language the user writes in (Bengali or English).`;
 
-  let history = [], loading = false, opened = false;
+  let history = [];
+  let loading = false;
+  let opened = false;
 
   const toggle = document.getElementById('rh-chat-toggle');
   const win    = document.getElementById('rh-chat-window');
-  const close  = document.getElementById('rh-close');
+  const closeB = document.getElementById('rh-close');
   const msgs   = document.getElementById('rh-msgs');
   const input  = document.getElementById('rh-input');
-  const send   = document.getElementById('rh-send');
+  const sendB  = document.getElementById('rh-send');
 
-  // Open / Close
   toggle.onclick = () => {
     const isOpen = win.style.display === 'flex';
-    win.style.display = isOpen ? 'none' : 'flex';
-    toggle.innerHTML = isOpen ? '💬 Ask My Assistant' : '✕ Close';
-    if (!isOpen && !opened) {
-      opened = true;
-      addBot("হ্যালো! 👋 আমি Robin-এর AI Assistant। তার সেবা, অভিজ্ঞতা বা যোগাযোগ সম্পর্কে যেকোনো প্রশ্ন করুন!");
-      addQuickReplies(["What services do you offer?", "How to contact Robin?", "Tax advisory?", "Audit services?"]);
+    if (isOpen) {
+      win.style.display = 'none';
+      toggle.innerHTML = '💬 Ask My Assistant';
+    } else {
+      win.style.display = 'flex';
+      toggle.innerHTML = '✕ Close';
+      if (!opened) {
+        opened = true;
+        addBot("হ্যালো! 👋 আমি Robin-এর AI Assistant। তার সেবা, অভিজ্ঞতা বা যোগাযোগ সম্পর্কে যেকোনো প্রশ্ন করুন!");
+        addQuickReplies(["What services do you offer?", "How to contact Robin?", "Tax advisory?", "Audit services?"]);
+      }
     }
   };
 
-  close.onclick = () => {
+  closeB.onclick = () => {
     win.style.display = 'none';
     toggle.innerHTML = '💬 Ask My Assistant';
   };
@@ -1208,7 +1214,8 @@ Answer in the same language the user writes in (Bengali or English).`;
 
   function showTyping() {
     const d = document.createElement('div');
-    d.className = 'rh-typing'; d.id = 'rh-typing';
+    d.className = 'rh-typing';
+    d.id = 'rh-typing';
     d.innerHTML = '<span></span><span></span><span></span>';
     msgs.appendChild(d);
     msgs.scrollTop = msgs.scrollHeight;
@@ -1221,52 +1228,73 @@ Answer in the same language the user writes in (Bengali or English).`;
 
   async function sendMsg(text) {
     if (!text.trim() || loading) return;
-    loading = true; send.disabled = true;
+    loading = true;
+    sendB.disabled = true;
 
     addUser(text);
-    history.push({ role: 'user', parts: [{ text }] });
+
+    // Add to history
+    history.push({
+      role: 'user',
+      parts: [{ text: SYSTEM_CONTEXT + '\n\nUser: ' + text }]
+    });
+
     showTyping();
 
     try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            system_instruction: { parts: [{ text: SYSTEM }] },
-            contents: history
-          })
+      const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + API_KEY;
+
+      const body = {
+        contents: history,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 300
         }
-      );
+      };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        throw new Error('API error: ' + res.status);
+      }
+
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
-        || "দুঃখিত, উত্তর পেতে সমস্যা হচ্ছে। Robin-এর সাথে সরাসরি যোগাযোগ করুন: hossainrobin.ca@gmail.com";
+        || "দুঃখিত, উত্তর পেতে সমস্যা হচ্ছে। Robin-এর সাথে সরাসরি যোগাযোগ করুন।";
 
-      history.push({ role: 'model', parts: [{ text: reply }] });
+      history.push({
+        role: 'model',
+        parts: [{ text: reply }]
+      });
+
       hideTyping();
       addBot(reply);
 
     } catch(e) {
+      console.error('Chatbot error:', e);
       hideTyping();
       addBot("সংযোগ সমস্যা হচ্ছে। Robin-এর সাথে যোগাযোগ করুন:\n📧 hossainrobin.ca@gmail.com\n📱 WhatsApp: +880 140-057-5079");
     }
 
-    loading = false; send.disabled = false;
+    loading = false;
+    sendB.disabled = false;
+    input.focus();
   }
 
-  send.onclick = () => {
+  sendB.onclick = () => {
     const t = input.value.trim();
-    input.value = '';
-    sendMsg(t);
+    if (t) { input.value = ''; sendMsg(t); }
   };
 
   input.onkeydown = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const t = input.value.trim();
-      input.value = '';
-      sendMsg(t);
+      if (t) { input.value = ''; sendMsg(t); }
     }
   };
 
