@@ -994,28 +994,164 @@ function sendEmail(){
   window.location.href='mailto:hossainrobin.ca@gmail.com?subject='+encodeURIComponent(subject)+'&body='+body;
 }
 </script>
-<!-- CHATBOT TOGGLE BUTTON -->
-<button id="rh-chat-toggle" style="position:fixed;bottom:28px;right:28px;height:52px;padding:0 20px;border-radius:50px;background:linear-gradient(135deg,#1a2a1a,#2d4a2d);border:2px solid #c9a84c;color:#c9a84c;font-size:14px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.25);display:flex;align-items:center;gap:8px;z-index:9999;white-space:nowrap;font-family:Georgia,serif;letter-spacing:0.3px;">💬 Ask My Assistant</button>
+<style>
+#rh-chat-toggle {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  height: 52px;
+  padding: 0 20px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #1a2a1a, #2d4a2d);
+  border: 2px solid #c9a84c;
+  color: #c9a84c;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 9999;
+  font-family: Georgia, serif;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+#rh-chat-window {
+  display: none;
+  position: fixed;
+  bottom: 92px;
+  right: 28px;
+  width: 360px;
+  max-height: 540px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9998;
+  font-family: Georgia, serif;
+}
+.rh-header {
+  background: linear-gradient(135deg, #1a2a1a, #2d4a2d);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rh-av {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: #c9a84c;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; color: #1a2a1a; font-size: 15px; flex-shrink: 0;
+}
+.rh-header h3 { color: #fff; font-size: 14px; font-weight: normal; margin: 0; }
+.rh-header span { color: #c9a84c; font-size: 11px; }
+#rh-close {
+  margin-left: auto; background: none; border: none;
+  color: rgba(255,255,255,0.7); font-size: 18px; cursor: pointer;
+}
+#rh-msgs {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  background: #fafaf8; min-height: 200px; max-height: 360px;
+}
+.rh-bot-msg {
+  align-self: flex-start; max-width: 85%;
+  background: #fff; border: 1px solid #e8e4dc;
+  border-radius: 14px 14px 14px 4px;
+  padding: 10px 14px; font-size: 13.5px;
+  line-height: 1.6; color: #1a1a1a;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.rh-user-msg {
+  align-self: flex-end; max-width: 85%;
+  background: linear-gradient(135deg, #1a2a1a, #2d4a2d);
+  color: #f5f3ef; border-radius: 14px 14px 4px 14px;
+  padding: 10px 14px; font-size: 13.5px; line-height: 1.6;
+}
+.rh-qr-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-self: flex-start; }
+.rh-qr {
+  background: #fff; border: 1.5px solid #c9a84c;
+  color: #1a2a1a; font-size: 12px; padding: 5px 12px;
+  border-radius: 20px; cursor: pointer; font-family: Georgia, serif;
+}
+.rh-qr:hover { background: #c9a84c; }
+.rh-typing {
+  align-self: flex-start;
+  background: #fff; border: 1px solid #e8e4dc;
+  border-radius: 14px 14px 14px 4px;
+  padding: 12px 16px; display: flex; gap: 5px; align-items: center;
+}
+.rh-typing span {
+  width: 7px; height: 7px; background: #aaa;
+  border-radius: 50%; display: inline-block;
+  animation: rhDot 1.2s infinite ease-in-out;
+}
+.rh-typing span:nth-child(2) { animation-delay: 0.2s; }
+.rh-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes rhDot {
+  0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+.rh-input-area {
+  padding: 12px; border-top: 1px solid #ede9e0;
+  background: #fff; display: flex; gap: 8px; align-items: flex-end;
+}
+#rh-input {
+  flex: 1; border: 1.5px solid #e0dbd0; border-radius: 10px;
+  padding: 9px 13px; font-size: 13.5px; font-family: Georgia, serif;
+  resize: none; outline: none; background: #fafaf8; line-height: 1.5;
+}
+#rh-input:focus { border-color: #c9a84c; }
+#rh-send {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #1a2a1a, #2d4a2d);
+  border: none; color: #c9a84c; font-size: 16px; cursor: pointer; flex-shrink: 0;
+}
+@media(max-width:420px){
+  #rh-chat-window { width: calc(100vw - 24px); right: 12px; }
+  #rh-chat-toggle { right: 12px; bottom: 16px; }
+}
+</style>
 
-<!-- CHATBOT WINDOW -->
-<div id="rh-chat-window" style="display:none;position:fixed;bottom:100px;right:28px;width:360px;max-height:540px;background:#fff;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,0.18);flex-direction:column;overflow:hidden;z-index:9998;font-family:Georgia,serif;">
-  <div style="background:linear-gradient(135deg,#1a2a1a,#2d4a2d);padding:16px 18px;display:flex;align-items:center;gap:12px;">
-    <div style="width:40px;height:40px;border-radius:50%;background:#c9a84c;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#1a2a1a;">RH</div>
-    <div><div style="color:#fff;font-size:15px;">Robin's Assistant</div><div style="color:#c9a84c;font-size:12px;">✦ Ask me anything</div></div>
-    <button id="rh-close" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);font-size:20px;cursor:pointer;">✕</button>
+<!-- Toggle Button -->
+<button id="rh-chat-toggle">💬 Ask My Assistant</button>
+
+<!-- Chat Window -->
+<div id="rh-chat-window">
+  <div class="rh-header">
+    <div class="rh-av">RH</div>
+    <div>
+      <h3>Robin's Assistant</h3>
+      <span>✦ Powered by AI</span>
+    </div>
+    <button id="rh-close">✕</button>
   </div>
-  <div id="rh-msgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fafaf8;min-height:200px;max-height:360px;"></div>
-  <div style="padding:12px;border-top:1px solid #ede9e0;background:#fff;display:flex;gap:8px;">
-    <textarea id="rh-input" rows="1" placeholder="Type a message…" style="flex:1;border:1.5px solid #e0dbd0;border-radius:10px;padding:9px 13px;font-size:13.5px;font-family:Georgia,serif;resize:none;outline:none;background:#fafaf8;"></textarea>
-    <button id="rh-send" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1a2a1a,#2d4a2d);border:none;color:#c9a84c;font-size:16px;cursor:pointer;">➤</button>
+  <div id="rh-msgs"></div>
+  <div class="rh-input-area">
+    <textarea id="rh-input" rows="1" placeholder="আপনার প্রশ্ন লিখুন..."></textarea>
+    <button id="rh-send">➤</button>
   </div>
 </div>
 
 <script>
 (function(){
-  const SYSTEM = `You are a helpful assistant for Robin Hossain's portfolio. Robin is a Professional Accountant and Audit & Finance Consultant in Bangladesh. Services: audit, financial reporting, tax advisory, bookkeeping, business consulting. Email: hossainrobin.ca@gmail.com, WhatsApp: +880 140-057-5079. Be concise, warm, professional. Encourage visitors to contact Robin.`;
+
+  // ✅ এখানে আপনার Gemini API Key বসান
+  const API_KEY = 'AIzaSyBiEaDBMH6KUUtvF7-APc5_dVKBobXDiMQ';
+
+  const SYSTEM = `You are a helpful assistant for Robin Hossain's professional portfolio website.
+Robin is a Professional Accountant and Audit & Finance Consultant based in Bangladesh.
+Services: Audit & assurance, financial reporting, tax advisory, bookkeeping, business consulting.
+Email: hossainrobin.ca@gmail.com
+WhatsApp: +880 140-057-5079
+LinkedIn: linkedin.com/in/robinhossain37189
+Be concise, warm, and professional. Always encourage visitors to contact Robin directly.
+Answer in the same language the user writes in (Bengali or English).`;
 
   let history = [], loading = false, opened = false;
+
   const toggle = document.getElementById('rh-chat-toggle');
   const win    = document.getElementById('rh-chat-window');
   const close  = document.getElementById('rh-close');
@@ -1023,63 +1159,117 @@ function sendEmail(){
   const input  = document.getElementById('rh-input');
   const send   = document.getElementById('rh-send');
 
+  // Open / Close
   toggle.onclick = () => {
     const isOpen = win.style.display === 'flex';
     win.style.display = isOpen ? 'none' : 'flex';
-    toggle.textContent = isOpen ? '💬' : '✕';
-    if (!isOpen && !opened) { opened=true; botMsg("Hi! 👋 I'm Robin's assistant. Ask me about his services, experience, or how to get in touch!", ["What services?","Contact Robin","Qualifications","Tax advisory?"]); }
+    toggle.innerHTML = isOpen ? '💬 Ask My Assistant' : '✕ Close';
+    if (!isOpen && !opened) {
+      opened = true;
+      addBot("হ্যালো! 👋 আমি Robin-এর AI Assistant। তার সেবা, অভিজ্ঞতা বা যোগাযোগ সম্পর্কে যেকোনো প্রশ্ন করুন!");
+      addQuickReplies(["What services do you offer?", "How to contact Robin?", "Tax advisory?", "Audit services?"]);
+    }
   };
-  close.onclick = () => { win.style.display='none'; toggle.textContent='💬'; };
 
-  function botMsg(text, qr) {
+  close.onclick = () => {
+    win.style.display = 'none';
+    toggle.innerHTML = '💬 Ask My Assistant';
+  };
+
+  function addBot(text) {
     const d = document.createElement('div');
-    d.style.cssText = 'align-self:flex-start;max-width:82%;';
-    const b = document.createElement('div');
-    b.style.cssText = 'background:#fff;border:1px solid #e8e4dc;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13.5px;line-height:1.55;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,0.06);';
-    b.textContent = text; d.appendChild(b);
-    if(qr){ const w=document.createElement('div'); w.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;';
-      qr.forEach(l=>{ const btn=document.createElement('button'); btn.textContent=l;
-        btn.style.cssText='background:#fff;border:1.5px solid #c9a84c;color:#1a2a1a;font-size:12px;padding:5px 11px;border-radius:20px;cursor:pointer;font-family:Georgia,serif;';
-        btn.onclick=()=>{ w.remove(); sendMsg(l); }; w.appendChild(btn); }); d.appendChild(w); }
-    msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+    d.className = 'rh-bot-msg';
+    d.textContent = text;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function userMsg(text) {
+  function addUser(text) {
     const d = document.createElement('div');
-    d.style.cssText = 'align-self:flex-end;max-width:82%;';
-    const b = document.createElement('div');
-    b.style.cssText = 'background:linear-gradient(135deg,#1a2a1a,#2d4a2d);color:#f5f3ef;border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:13.5px;line-height:1.55;';
-    b.textContent = text; d.appendChild(b);
-    msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+    d.className = 'rh-user-msg';
+    d.textContent = text;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function typingOn() {
-    const d=document.createElement('div'); d.id='rh-typing'; d.style.cssText='align-self:flex-start;';
-    d.innerHTML='<div style="background:#fff;border:1px solid #e8e4dc;border-radius:14px 14px 14px 4px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><span style="display:inline-flex;gap:5px;">'+'<span style="width:7px;height:7px;background:#aaa;border-radius:50%;display:inline-block;animation:td 1.2s infinite ease-in-out;"></span>'.repeat(3)+'</span></div>';
-    msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+  function addQuickReplies(list) {
+    const w = document.createElement('div');
+    w.className = 'rh-qr-wrap';
+    list.forEach(label => {
+      const btn = document.createElement('button');
+      btn.className = 'rh-qr';
+      btn.textContent = label;
+      btn.onclick = () => { w.remove(); sendMsg(label); };
+      w.appendChild(btn);
+    });
+    msgs.appendChild(w);
+    msgs.scrollTop = msgs.scrollHeight;
   }
-  function typingOff(){ const el=document.getElementById('rh-typing'); if(el)el.remove(); }
+
+  function showTyping() {
+    const d = document.createElement('div');
+    d.className = 'rh-typing'; d.id = 'rh-typing';
+    d.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function hideTyping() {
+    const el = document.getElementById('rh-typing');
+    if (el) el.remove();
+  }
 
   async function sendMsg(text) {
-    if(!text.trim()||loading) return;
-    loading=true; send.disabled=true;
-    userMsg(text); history.push({role:'user',content:text}); typingOn();
+    if (!text.trim() || loading) return;
+    loading = true; send.disabled = true;
+
+    addUser(text);
+    history.push({ role: 'user', parts: [{ text }] });
+    showTyping();
+
     try {
-      const r = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:history})});
-      const d = await r.json();
-      const reply = d.content?.[0]?.text || "Sorry, couldn't get a response. Contact Robin at hossainrobin.ca@gmail.com";
-      history.push({role:'assistant',content:reply}); typingOff(); botMsg(reply);
-    } catch(e){ typingOff(); botMsg("Connection issue. Reach Robin at hossainrobin.ca@gmail.com or WhatsApp +880 140-057-5079"); }
-    loading=false; send.disabled=false;
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: SYSTEM }] },
+            contents: history
+          })
+        }
+      );
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+        || "দুঃখিত, উত্তর পেতে সমস্যা হচ্ছে। Robin-এর সাথে সরাসরি যোগাযোগ করুন: hossainrobin.ca@gmail.com";
+
+      history.push({ role: 'model', parts: [{ text: reply }] });
+      hideTyping();
+      addBot(reply);
+
+    } catch(e) {
+      hideTyping();
+      addBot("সংযোগ সমস্যা হচ্ছে। Robin-এর সাথে যোগাযোগ করুন:\n📧 hossainrobin.ca@gmail.com\n📱 WhatsApp: +880 140-057-5079");
+    }
+
+    loading = false; send.disabled = false;
   }
 
-  send.onclick = ()=>{ const t=input.value.trim(); input.value=''; sendMsg(t); };
-  input.onkeydown = e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); const t=input.value.trim(); input.value=''; sendMsg(t); } };
+  send.onclick = () => {
+    const t = input.value.trim();
+    input.value = '';
+    sendMsg(t);
+  };
 
-  const style=document.createElement('style');
-  style.textContent='@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}';
-  document.head.appendChild(style);
+  input.onkeydown = e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const t = input.value.trim();
+      input.value = '';
+      sendMsg(t);
+    }
+  };
+
 })();
 </script>
 </body>
