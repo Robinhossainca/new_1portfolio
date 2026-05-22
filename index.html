@@ -994,5 +994,93 @@ function sendEmail(){
   window.location.href='mailto:hossainrobin.ca@gmail.com?subject='+encodeURIComponent(subject)+'&body='+body;
 }
 </script>
+<!-- CHATBOT TOGGLE BUTTON -->
+<button id="rh-chat-toggle" style="position:fixed;bottom:28px;right:28px;height:52px;padding:0 20px;border-radius:50px;background:linear-gradient(135deg,#1a2a1a,#2d4a2d);border:2px solid #c9a84c;color:#c9a84c;font-size:14px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.25);display:flex;align-items:center;gap:8px;z-index:9999;white-space:nowrap;font-family:Georgia,serif;letter-spacing:0.3px;">💬 Ask My Assistant</button>
+
+<!-- CHATBOT WINDOW -->
+<div id="rh-chat-window" style="display:none;position:fixed;bottom:100px;right:28px;width:360px;max-height:540px;background:#fff;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,0.18);flex-direction:column;overflow:hidden;z-index:9998;font-family:Georgia,serif;">
+  <div style="background:linear-gradient(135deg,#1a2a1a,#2d4a2d);padding:16px 18px;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:#c9a84c;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#1a2a1a;">RH</div>
+    <div><div style="color:#fff;font-size:15px;">Robin's Assistant</div><div style="color:#c9a84c;font-size:12px;">✦ Ask me anything</div></div>
+    <button id="rh-close" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);font-size:20px;cursor:pointer;">✕</button>
+  </div>
+  <div id="rh-msgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fafaf8;min-height:200px;max-height:360px;"></div>
+  <div style="padding:12px;border-top:1px solid #ede9e0;background:#fff;display:flex;gap:8px;">
+    <textarea id="rh-input" rows="1" placeholder="Type a message…" style="flex:1;border:1.5px solid #e0dbd0;border-radius:10px;padding:9px 13px;font-size:13.5px;font-family:Georgia,serif;resize:none;outline:none;background:#fafaf8;"></textarea>
+    <button id="rh-send" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1a2a1a,#2d4a2d);border:none;color:#c9a84c;font-size:16px;cursor:pointer;">➤</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SYSTEM = `You are a helpful assistant for Robin Hossain's portfolio. Robin is a Professional Accountant and Audit & Finance Consultant in Bangladesh. Services: audit, financial reporting, tax advisory, bookkeeping, business consulting. Email: hossainrobin.ca@gmail.com, WhatsApp: +880 140-057-5079. Be concise, warm, professional. Encourage visitors to contact Robin.`;
+
+  let history = [], loading = false, opened = false;
+  const toggle = document.getElementById('rh-chat-toggle');
+  const win    = document.getElementById('rh-chat-window');
+  const close  = document.getElementById('rh-close');
+  const msgs   = document.getElementById('rh-msgs');
+  const input  = document.getElementById('rh-input');
+  const send   = document.getElementById('rh-send');
+
+  toggle.onclick = () => {
+    const isOpen = win.style.display === 'flex';
+    win.style.display = isOpen ? 'none' : 'flex';
+    toggle.textContent = isOpen ? '💬' : '✕';
+    if (!isOpen && !opened) { opened=true; botMsg("Hi! 👋 I'm Robin's assistant. Ask me about his services, experience, or how to get in touch!", ["What services?","Contact Robin","Qualifications","Tax advisory?"]); }
+  };
+  close.onclick = () => { win.style.display='none'; toggle.textContent='💬'; };
+
+  function botMsg(text, qr) {
+    const d = document.createElement('div');
+    d.style.cssText = 'align-self:flex-start;max-width:82%;';
+    const b = document.createElement('div');
+    b.style.cssText = 'background:#fff;border:1px solid #e8e4dc;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13.5px;line-height:1.55;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,0.06);';
+    b.textContent = text; d.appendChild(b);
+    if(qr){ const w=document.createElement('div'); w.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;';
+      qr.forEach(l=>{ const btn=document.createElement('button'); btn.textContent=l;
+        btn.style.cssText='background:#fff;border:1.5px solid #c9a84c;color:#1a2a1a;font-size:12px;padding:5px 11px;border-radius:20px;cursor:pointer;font-family:Georgia,serif;';
+        btn.onclick=()=>{ w.remove(); sendMsg(l); }; w.appendChild(btn); }); d.appendChild(w); }
+    msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  function userMsg(text) {
+    const d = document.createElement('div');
+    d.style.cssText = 'align-self:flex-end;max-width:82%;';
+    const b = document.createElement('div');
+    b.style.cssText = 'background:linear-gradient(135deg,#1a2a1a,#2d4a2d);color:#f5f3ef;border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:13.5px;line-height:1.55;';
+    b.textContent = text; d.appendChild(b);
+    msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  function typingOn() {
+    const d=document.createElement('div'); d.id='rh-typing'; d.style.cssText='align-self:flex-start;';
+    d.innerHTML='<div style="background:#fff;border:1px solid #e8e4dc;border-radius:14px 14px 14px 4px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><span style="display:inline-flex;gap:5px;">'+'<span style="width:7px;height:7px;background:#aaa;border-radius:50%;display:inline-block;animation:td 1.2s infinite ease-in-out;"></span>'.repeat(3)+'</span></div>';
+    msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
+  }
+  function typingOff(){ const el=document.getElementById('rh-typing'); if(el)el.remove(); }
+
+  async function sendMsg(text) {
+    if(!text.trim()||loading) return;
+    loading=true; send.disabled=true;
+    userMsg(text); history.push({role:'user',content:text}); typingOn();
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:history})});
+      const d = await r.json();
+      const reply = d.content?.[0]?.text || "Sorry, couldn't get a response. Contact Robin at hossainrobin.ca@gmail.com";
+      history.push({role:'assistant',content:reply}); typingOff(); botMsg(reply);
+    } catch(e){ typingOff(); botMsg("Connection issue. Reach Robin at hossainrobin.ca@gmail.com or WhatsApp +880 140-057-5079"); }
+    loading=false; send.disabled=false;
+  }
+
+  send.onclick = ()=>{ const t=input.value.trim(); input.value=''; sendMsg(t); };
+  input.onkeydown = e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); const t=input.value.trim(); input.value=''; sendMsg(t); } };
+
+  const style=document.createElement('style');
+  style.textContent='@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}';
+  document.head.appendChild(style);
+})();
+</script>
 </body>
 </html>
