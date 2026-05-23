@@ -1268,9 +1268,10 @@ async function sendMsg(text) {
       }
 
       const data = await res.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
-        || "দুঃখিত, উত্তর পেতে সমস্যা হচ্ছে। Robin-এর সাথে সরাসরি যোগাযোগ করুন।";
 
+const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+  || "দুঃখিত, উত্তর পেতে সমস্যা হচ্ছে। Robin-এর সাথে সরাসরি যোগাযোগ করুন:\n📧 hossainrobin.ca@gmail.com\n📱 WhatsApp: +880 140-057-5079";
+      
       history.push({
         role: 'model',
         parts: [{ text: reply }]
