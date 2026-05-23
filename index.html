@@ -1232,7 +1232,7 @@ async function sendMsg(text) {
     showTyping();
 
     try {
-      const url = '/.netlify/functions/chat';
+      const url = '/api/chat';
 
       const fullContents = [
         { role: 'user', parts: [{ text: SYSTEM_CONTEXT }] },
